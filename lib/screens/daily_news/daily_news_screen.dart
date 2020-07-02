@@ -2,10 +2,13 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutternews/blocs/bookmarks/bookmark_bloc.dart';
+import 'package:flutternews/blocs/bookmarks/bookmark_event.dart';
+import 'package:flutternews/blocs/daily_news/bloc.dart';
 import 'package:flutternews/model/news_model.dart';
-import 'package:flutternews/screens/daily_news/bloc.dart';
 import 'package:flutternews/screens/details/details_news_screen.dart';
 import 'package:flutternews/widgets/item_header_text.dart';
+import 'package:flutternews/widgets/news_option_icons.dart';
 import 'package:flutternews/widgets/publisher_info.dart';
 import 'package:flutternews/widgets/rounded_image.dart';
 import 'latest_news_item.dart';
@@ -18,7 +21,6 @@ class DailyNewsScreen extends StatefulWidget {
 
 class DailyNewsScreenState extends State<DailyNewsScreen> {
   Completer<void> _refreshCompleter;
-
 
   @override
   void initState() {
@@ -47,26 +49,27 @@ class DailyNewsScreenState extends State<DailyNewsScreen> {
         });
   }
 
-  Widget _getHeader(String title, String addHeader) => Container(
-      margin: EdgeInsets.fromLTRB(0, 0, 8, 18),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: <Widget>[
-          Text(
-            title,
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          Text(addHeader,
-              style: TextStyle(
-                color: Colors.blue,
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ))
-        ],
-      ));
+  Widget _getHeader(String title, String addHeader) =>
+      Container(
+          margin: EdgeInsets.fromLTRB(0, 0, 8, 18),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              Text(
+                title,
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              Text(addHeader,
+                  style: TextStyle(
+                    color: Colors.blue,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ))
+            ],
+          ));
 
   Widget _getTopNews(BuildContext context) {
     return BlocBuilder<TopNewsBloc, NewsState>(builder: (context, state) {
@@ -112,7 +115,7 @@ class DailyNewsScreenState extends State<DailyNewsScreen> {
   }
 }
 
-class TopStoriesDetails extends StatelessWidget {
+class TopStoriesDetails extends StatelessWidget implements BookmarkListener {
   final NewsModel newsModel;
 
   TopStoriesDetails(this.newsModel);
@@ -123,9 +126,19 @@ class TopStoriesDetails extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         PublisherInfo(newsModel.publisherImageUrl,
-            '${newsModel.publisherName} • ${newsModel.date.timeAgo}'),
+            '${newsModel.publisherName} • ${newsModel.date.timeAgo}', false, this),
         ItemHeaderText(newsModel.title)
       ],
     );
+  }
+
+  @override
+  void save(BuildContext context) {
+    BlocProvider.of<BookmarkBloc>(context).add(SaveNews(newsModel));
+  }
+
+  @override
+  void delete(BuildContext context) {
+    BlocProvider.of<BookmarkBloc>(context).add(DeleteNews(newsModel));
   }
 }

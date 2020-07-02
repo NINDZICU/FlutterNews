@@ -2,8 +2,8 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutternews/model/news_model.dart';
-import 'package:flutternews/repository/news_repository.dart';
-import './bloc.dart';
+import 'package:flutternews/data/repository/news_repository.dart';
+import '../../blocs/daily_news/bloc.dart';
 
 class TopNewsBloc extends Bloc<NewsEvent, NewsState> {
   final NewsRepository _newsRepository;

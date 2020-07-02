@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
-import 'package:flutternews/api/api_client.dart';
-import 'package:flutternews/api/entity/news_entity.dart';
+import 'package:flutternews/data/api/api_client.dart';
+import 'package:flutternews/data/api/entity/news_entity.dart';
 import 'package:logger/logger.dart';
 
 class NewsRepository {

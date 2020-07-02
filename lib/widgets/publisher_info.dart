@@ -6,8 +6,10 @@ import 'news_option_icons.dart';
 class PublisherInfo extends StatelessWidget {
   final String imageUrl;
   final String title;
+  final bool _isSaved;
+  final BookmarkListener _bookmarkListener;
 
-  PublisherInfo(this.imageUrl, this.title);
+  PublisherInfo(this.imageUrl, this.title, this._isSaved, this._bookmarkListener);
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +19,7 @@ class PublisherInfo extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[
           IconWithTitle(imageUrl, title),
-          OptionIcons()
+          OptionIcons(_isSaved, _bookmarkListener)
         ],
       ),
     );

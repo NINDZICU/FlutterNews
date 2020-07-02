@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutternews/blocs/search/search_bloc.dart';
+import 'package:flutternews/blocs/search/search_event.dart';
+import 'package:flutternews/blocs/search/search_state.dart';
 import 'package:flutternews/model/news_model.dart';
 import 'package:flutternews/screens/details/details_news_screen.dart';
-import 'package:flutternews/screens/search/search_event.dart';
-import 'package:flutternews/screens/search/search_state.dart';
-import 'package:flutternews/screens/search/search_bloc.dart';
 
 class CustomSearchDelegate extends SearchDelegate {
   SearchBloc _searchBloc;

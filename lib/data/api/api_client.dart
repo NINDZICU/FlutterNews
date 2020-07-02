@@ -1,4 +1,4 @@
-import 'package:flutternews/api/entity/response.dart';
+import 'package:flutternews/data/api/entity/response.dart';
 import 'package:retrofit/http.dart';
 import 'package:dio/dio.dart';
 

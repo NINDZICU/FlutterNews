@@ -1,38 +1,55 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutternews/repository/news_repository.dart';
-import 'package:flutternews/screens/daily_news/bloc.dart';
+import 'package:flutternews/blocs/bookmarks/bookmark_bloc.dart';
+import 'package:flutternews/data/db/database.dart';
+import 'package:flutternews/data/repository/news_db_repository.dart';
+import 'package:flutternews/data/repository/news_repository.dart';
+import 'package:flutternews/blocs/daily_news/bloc.dart';
 import 'package:flutternews/screens/search/custom_search_delegate.dart';
 import 'package:flutternews/screens/bookmarks/bookmarks_sreen.dart';
 import 'package:flutternews/screens/daily_news/daily_news_screen.dart';
 import 'package:flutternews/screens/settings/settings_screen.dart';
-import 'package:flutternews/screens/search/search_bloc.dart';
+import 'blocs/search/search_bloc.dart';
 import 'icons/my_flutter_app_icons.dart';
 
-void main() => runApp(
-      MultiRepositoryProvider(
-        providers: [RepositoryProvider(create: (context) => NewsRepository())],
-        child: MultiBlocProvider(
-          providers: [
-            BlocProvider(
-              create: (context) =>
-                  LatestNewsBloc(RepositoryProvider.of<NewsRepository>(context))
-                    ..add(FirstLoading()),
-            ),
-            BlocProvider(
-              create: (context) =>
-                  TopNewsBloc(RepositoryProvider.of<NewsRepository>(context))
-                    ..add(FirstLoading()),
-            ),
-            BlocProvider(
-              create: (context) =>
-                  SearchBloc(RepositoryProvider.of<NewsRepository>(context)),
-            ),
-          ],
-          child: MyApp(),
-        ),
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  final database =
+      await $FloorAppDatabase.databaseBuilder('app_database').build();
+
+  runApp(
+    MultiRepositoryProvider(
+      providers: [
+        RepositoryProvider(create: (context) => NewsRepository()),
+        RepositoryProvider(
+            create: (context) => NewsDbRepository(database.newsDao)),
+      ],
+      child: MultiBlocProvider(
+        providers: [
+          BlocProvider(
+            create: (context) =>
+                LatestNewsBloc(RepositoryProvider.of<NewsRepository>(context))
+                  ..add(FirstLoading()),
+          ),
+          BlocProvider(
+            create: (context) =>
+                TopNewsBloc(RepositoryProvider.of<NewsRepository>(context))
+                  ..add(FirstLoading()),
+          ),
+          BlocProvider(
+            create: (context) =>
+                SearchBloc(RepositoryProvider.of<NewsRepository>(context)),
+          ),
+          BlocProvider(
+            create: (context) =>
+                BookmarkBloc(RepositoryProvider.of<NewsDbRepository>(context)),
+          ),
+        ],
+        child: MyApp(),
       ),
-    );
+    ),
+  );
+}
 
 class MyApp extends StatelessWidget {
   @override

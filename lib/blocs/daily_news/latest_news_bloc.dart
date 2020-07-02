@@ -3,8 +3,8 @@ import 'dart:convert';
 import 'package:bloc/bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutternews/model/news_model.dart';
-import 'package:flutternews/repository/news_repository.dart';
-import './bloc.dart';
+import 'package:flutternews/data/repository/news_repository.dart';
+import 'bloc.dart';
 import 'package:http/http.dart' as http;
 
 class LatestNewsBloc extends Bloc<NewsEvent, NewsState> {

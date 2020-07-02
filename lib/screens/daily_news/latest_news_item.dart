@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutternews/blocs/bookmarks/bookmark_bloc.dart';
+import 'package:flutternews/blocs/bookmarks/bookmark_event.dart';
 import 'package:flutternews/model/news_model.dart';
 import 'package:flutternews/screens/details/details_news_screen.dart';
 import 'package:flutternews/widgets/item_header_text.dart';
+import 'package:flutternews/widgets/news_option_icons.dart';
 import 'package:flutternews/widgets/publisher_info.dart';
 import 'package:flutternews/widgets/rounded_image.dart';
 import 'package:flutternews/util/extensions.dart';
@@ -15,7 +19,7 @@ class LatestNewsItem extends StatefulWidget {
   LatestNewsItemState createState() => LatestNewsItemState(_newsModel);
 }
 
-class LatestNewsItemState extends State<LatestNewsItem> {
+class LatestNewsItemState extends State<LatestNewsItem> implements BookmarkListener {
   final NewsModel _news;
 
   LatestNewsItemState(this._news);
@@ -41,7 +45,7 @@ class LatestNewsItemState extends State<LatestNewsItem> {
                   ],
                 ),
                 PublisherInfo(_news.publisherImageUrl,
-                    '${_news.publisherName} • ${_news.date.timeAgo} ')
+                    '${_news.publisherName} • ${_news.date.timeAgo} ', false, this)
               ],
             )));
   }
@@ -51,5 +55,15 @@ class LatestNewsItemState extends State<LatestNewsItem> {
         .push(MaterialPageRoute<void>(builder: (BuildContext buildContext) {
       return DetailsNewsScreen(_news);
     }));
+  }
+
+  @override
+  void save(BuildContext context) {
+    BlocProvider.of<BookmarkBloc>(context).add(SaveNews(_news));
+  }
+
+  @override
+  void delete(BuildContext context) {
+    BlocProvider.of<BookmarkBloc>(context).add(DeleteNews(_news));
   }
 }

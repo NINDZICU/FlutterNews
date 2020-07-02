@@ -38,6 +38,7 @@ dependencies:
   meta: ^1.1.8
   timeago: ^2.0.26
   intl: ^0.16.1
+  floor: ^0.13.0
 
 dev_dependencies:
   flutter_test:
@@ -45,6 +46,7 @@ dev_dependencies:
   retrofit_generator: any
   build_runner: any
   json_serializable: any
+  floor_generator: ^0.13.0
 
 
 # For information on the generic Dart part of this file, see the

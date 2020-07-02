@@ -1,4 +1,4 @@
-import 'package:flutternews/api/entity/source_entity.dart';
+import 'package:flutternews/data/api/entity/source_entity.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'news_entity.g.dart';
