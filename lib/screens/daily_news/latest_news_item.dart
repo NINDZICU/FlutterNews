@@ -12,17 +12,19 @@ import 'package:flutternews/util/extensions.dart';
 
 class LatestNewsItem extends StatefulWidget {
   final NewsModel _newsModel;
+  final List<NewsModel> _savedNews;
 
-  LatestNewsItem(this._newsModel);
+  LatestNewsItem(this._newsModel, this._savedNews);
 
   @override
-  LatestNewsItemState createState() => LatestNewsItemState(_newsModel);
+  LatestNewsItemState createState() => LatestNewsItemState(_newsModel, _savedNews);
 }
 
 class LatestNewsItemState extends State<LatestNewsItem> implements BookmarkListener {
   final NewsModel _news;
+  final List<NewsModel> _savedNews;
 
-  LatestNewsItemState(this._news);
+  LatestNewsItemState(this._news, this._savedNews);
 
   @override
   Widget build(BuildContext context) {
@@ -45,7 +47,7 @@ class LatestNewsItemState extends State<LatestNewsItem> implements BookmarkListe
                   ],
                 ),
                 PublisherInfo(_news.publisherImageUrl,
-                    '${_news.publisherName} • ${_news.date.timeAgo} ', false, this)
+                    '${_news.publisherName} • ${_news.date.timeAgo} ', _savedNews.contains(_news), this)
               ],
             )));
   }
@@ -59,11 +61,13 @@ class LatestNewsItemState extends State<LatestNewsItem> implements BookmarkListe
 
   @override
   void save(BuildContext context) {
+    _savedNews.add(_news);
     BlocProvider.of<BookmarkBloc>(context).add(SaveNews(_news));
   }
 
   @override
   void delete(BuildContext context) {
+    _savedNews.remove(_news);
     BlocProvider.of<BookmarkBloc>(context).add(DeleteNews(_news));
   }
 }

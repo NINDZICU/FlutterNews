@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutternews/blocs/bookmarks/bookmark_bloc.dart';
 import 'package:flutternews/blocs/bookmarks/bookmark_event.dart';
+import 'package:flutternews/blocs/bookmarks/bookmark_state.dart';
 import 'package:flutternews/blocs/daily_news/bloc.dart';
 import 'package:flutternews/model/news_model.dart';
 import 'package:flutternews/screens/details/details_news_screen.dart';
@@ -14,11 +15,13 @@ import 'package:flutternews/widgets/rounded_image.dart';
 import 'latest_news_item.dart';
 import 'package:flutternews/util/extensions.dart';
 
+List<NewsModel> _savedNews = [];
+
 class DailyNewsScreen extends StatefulWidget {
   @override
   DailyNewsScreenState createState() => DailyNewsScreenState();
-}
 
+}
 class DailyNewsScreenState extends State<DailyNewsScreen> {
   Completer<void> _refreshCompleter;
 
@@ -30,17 +33,26 @@ class DailyNewsScreenState extends State<DailyNewsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    BlocProvider.of<BookmarkBloc>(context).add(NewsLoading());
+
     return RefreshIndicator(
-        child: ListView(
-          padding: EdgeInsets.all(16),
-          children: <Widget>[
-            _getHeader('Top Stories', 'MORE'),
-            _getTopNews(context),
-            Container(
-                margin: EdgeInsets.only(top: 32),
-                child: _getHeader('Latest News', 'SEE ALL')),
-            _getLatestNews()
-          ],
+        child: BlocListener<BookmarkBloc, BookmarkState>(
+          listener: (context, state) {
+            if (state is BookmarkGetSuccess) {
+              _savedNews = state.news;
+            }
+          },
+          child: ListView(
+            padding: EdgeInsets.all(16),
+            children: <Widget>[
+              _getHeader('Top Stories', 'MORE'),
+              _getTopNews(context),
+              Container(
+                  margin: EdgeInsets.only(top: 32),
+                  child: _getHeader('Latest News', 'SEE ALL')),
+              _getLatestNews()
+            ],
+          ),
         ),
         onRefresh: () {
           BlocProvider.of<TopNewsBloc>(context).add(FirstLoading());
@@ -49,27 +61,26 @@ class DailyNewsScreenState extends State<DailyNewsScreen> {
         });
   }
 
-  Widget _getHeader(String title, String addHeader) =>
-      Container(
-          margin: EdgeInsets.fromLTRB(0, 0, 8, 18),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              Text(
-                title,
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              Text(addHeader,
-                  style: TextStyle(
-                    color: Colors.blue,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ))
-            ],
-          ));
+  Widget _getHeader(String title, String addHeader) => Container(
+      margin: EdgeInsets.fromLTRB(0, 0, 8, 18),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: <Widget>[
+          Text(
+            title,
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          Text(addHeader,
+              style: TextStyle(
+                color: Colors.blue,
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ))
+        ],
+      ));
 
   Widget _getTopNews(BuildContext context) {
     return BlocBuilder<TopNewsBloc, NewsState>(builder: (context, state) {
@@ -100,7 +111,7 @@ class DailyNewsScreenState extends State<DailyNewsScreen> {
         return Column(
           children: ListTile.divideTiles(
               context: context,
-              tiles: state.news.map((news) => LatestNewsItem(news))).toList(),
+              tiles: state.news.map((news) => LatestNewsItem(news, _savedNews))).toList(),
         );
       } else
         return Text('No Data');
@@ -116,29 +127,34 @@ class DailyNewsScreenState extends State<DailyNewsScreen> {
 }
 
 class TopStoriesDetails extends StatelessWidget implements BookmarkListener {
-  final NewsModel newsModel;
+  final NewsModel _newsModel;
 
-  TopStoriesDetails(this.newsModel);
+  TopStoriesDetails(this._newsModel);
 
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        PublisherInfo(newsModel.publisherImageUrl,
-            '${newsModel.publisherName} • ${newsModel.date.timeAgo}', false, this),
-        ItemHeaderText(newsModel.title)
+        PublisherInfo(
+            _newsModel.publisherImageUrl,
+            '${_newsModel.publisherName} • ${_newsModel.date.timeAgo}',
+            _savedNews.contains(_newsModel),
+            this),
+        ItemHeaderText(_newsModel.title)
       ],
     );
   }
 
   @override
   void save(BuildContext context) {
-    BlocProvider.of<BookmarkBloc>(context).add(SaveNews(newsModel));
+    _savedNews.add(_newsModel);
+    BlocProvider.of<BookmarkBloc>(context).add(SaveNews(_newsModel));
   }
 
   @override
   void delete(BuildContext context) {
-    BlocProvider.of<BookmarkBloc>(context).add(DeleteNews(newsModel));
+    _savedNews.remove(_newsModel);
+    BlocProvider.of<BookmarkBloc>(context).add(DeleteNews(_newsModel));
   }
 }

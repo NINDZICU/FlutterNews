@@ -1,4 +1,6 @@
-class NewsModel {
+import 'package:equatable/equatable.dart';
+
+class NewsModel extends Equatable {
   final String title;
   final String imageUrl;
   final publisherImageUrl;
@@ -8,4 +10,7 @@ class NewsModel {
 
   NewsModel(this.title, this.imageUrl, this.publisherImageUrl,
       this.publisherName, this.date, this.details);
+
+  @override
+  List<Object> get props => [title, date];
 }
